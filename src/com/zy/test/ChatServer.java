@@ -16,6 +16,8 @@ public class ChatServer {
 			ss = new ServerSocket(8888);
 		} catch (BindException e) {
 			System.out.println("Port is using...");
+			System.out.println("请关掉相关程序，并重新运行服务器");
+			System.exit(0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
