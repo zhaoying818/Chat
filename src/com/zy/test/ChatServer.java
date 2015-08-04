@@ -8,23 +8,41 @@ public class ChatServer {
 	
 	public static void main(String[] args){
 		boolean started = false;  //表示Server是否启动
+		ServerSocket ss = null;
+		Socket s = null;
+		DataInputStream dis = null;
 		try {
-			ServerSocket ss = new ServerSocket(8888);
+			ss = new ServerSocket(8888);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
 			started = true; //Server启动
 			while(started) {
 				boolean bConnected = false;//客户端是否连接上
-				Socket s = ss.accept();
+				s = ss.accept();
 System.out.println("a client connected!");
                 bConnected = true;//客户端连接上
-                DataInputStream dis = new DataInputStream(s.getInputStream());
+                dis = new DataInputStream(s.getInputStream());
                 while(bConnected){
                 	 String str = dis.readUTF();
                 	 System.out.println(str);
                 }
-                dis.close();
+                //dis.close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("Client closed!");
+		} finally {
+			try {
+				if(dis!=null) 
+					dis.close();
+				if(s!=null) 
+					s.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 
