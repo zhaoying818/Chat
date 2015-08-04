@@ -5,11 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
 
 
 public class ChatClient extends Frame{
+	Socket s = null;
 	
 	TextField tfTxt = new TextField();
 	TextArea taCon = new TextArea();
@@ -41,7 +43,7 @@ public class ChatClient extends Frame{
 	 */
 	public void connect(){
 		try {
-			Socket s = new Socket("127.0.0.1",8888);//IP+端口号
+			s = new Socket("127.0.0.1",8888);//IP+端口号
 System.out.println("connceted");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -53,9 +55,18 @@ System.out.println("connceted");
 	private class TFListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			String s = tfTxt.getText().trim();//取出tfTxt中的内容
-			taCon.setText(s);//取出的内容放在taCon
+			String str = tfTxt.getText().trim();//取出tfTxt中的内容
+			taCon.setText(str);//取出的内容放在taCon
 			tfTxt.setText("");
+			//发送信息到服务器
+			try {
+				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+				dos.writeUTF(str);
+				dos.flush();
+				dos.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 		
 	}
