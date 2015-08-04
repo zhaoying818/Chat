@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
@@ -13,6 +14,8 @@ import java.net.*;
 public class ChatClient extends Frame{
 	Socket s = null;
 	DataOutputStream dos = null;
+	DataInputStream dis = null;
+	private boolean bConnected = false;
 	
 	TextField tfTxt = new TextField();
 	TextArea taCon = new TextArea();
@@ -38,6 +41,8 @@ public class ChatClient extends Frame{
 		tfTxt.addActionListener(new TFListener());
 		setVisible(true);
 		connect();
+		
+		new Thread(new RecVThread()).start();
 	}
 	
 	/**
@@ -47,7 +52,9 @@ public class ChatClient extends Frame{
 		try {
 			s = new Socket("127.0.0.1",8888);//IP+端口号
 			dos = new DataOutputStream(s.getOutputStream());
+			dis = new DataInputStream(s.getInputStream());
 System.out.println("connceted");
+            bConnected = true;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -72,7 +79,7 @@ System.out.println("connceted");
 
 		public void actionPerformed(ActionEvent e) {
 			String str = tfTxt.getText().trim();//取出tfTxt中的内容
-			taCon.setText(str);//取出的内容放在taCon
+			//taCon.setText(str);//取出的内容放在taCon
 			tfTxt.setText("");
 			//发送信息到服务器
 			try {
@@ -86,5 +93,20 @@ System.out.println("connceted");
 		
 	}
 	
-	
+	private class RecVThread implements Runnable{
+		
+		public void run(){
+			try {
+				while(bConnected){
+				String str = dis.readUTF();
+				//System.out.println(str);
+				taCon.setText(taCon.getText() + str +'\n');
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			
+		}
+	}
 }
