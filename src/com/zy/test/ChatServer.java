@@ -68,11 +68,13 @@ System.out.println("a client connected!");
 			}
 		}
 		
-		public void send(String str){
+		public void send(String str) {
 			try {
 				dos.writeUTF(str);
 			} catch (IOException e) {
-				e.printStackTrace();
+				clients.remove(this);
+				System.out.println(" 对方退出，我从List中去除了!!!");
+				//e.printStackTrace();
 			}
 		}
 
@@ -98,8 +100,8 @@ System.out.println(str);
             		 c.send(str);
             	 }
             	 */
-            	 
             	 }
+            	 
              } catch (EOFException e){
      			System.out.println("Client closed!");
      		} catch (IOException e) {
@@ -108,19 +110,20 @@ System.out.println(str);
      			try {
      				if(dis!=null) {
      					dis.close();
-     					dis = null;
+     					//dis = null;
      				}
      				if(dos!=null){
      					dos.close();
-     					dos = null;
+     					//dos = null;
      				}		
      				if(s!=null) {
      					s.close();
-     					s = null; 
+     					//s = null; 
      				}		
      			} catch (IOException e1) {
      				e1.printStackTrace();
      			}
+     			
      		}
 			
 		}

@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.*;
 
@@ -128,8 +129,10 @@ System.out.println("connceted");
 				taCon.setText(taCon.getText() + str +'\n');
 				}
 			} catch (SocketException e) {
-				System.out.println("Exit!!!");
+				System.out.println("Quit!!!");
 				//e.printStackTrace();
+			} catch (EOFException e) {
+				System.out.println("Quit,byebye!!!");
 			} catch (IOException e) {
 				e.printStackTrace();
 			} 
