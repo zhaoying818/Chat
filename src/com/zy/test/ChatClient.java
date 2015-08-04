@@ -1,5 +1,7 @@
 package com.zy.test;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -26,7 +28,18 @@ public class ChatClient extends Frame{
 			}
 			
 		});
+		tfTxt.addActionListener(new TFListener());
 		setVisible(true);
+	}
+	
+	private class TFListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			String s = tfTxt.getText().trim();//取出tfTxt中的内容
+			taCon.setText(s);//取出的内容放在taCon
+			tfTxt.setText("");
+		}
+		
 	}
 	
 	
