@@ -5,15 +5,20 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.*;
 
+import javax.management.loading.PrivateClassLoader;
+
 public class ChatServer {
+	boolean started = false; 
+	ServerSocket ss = null;
 	
 	public static void main(String[] args){
-		boolean started = false;  //表示Server是否启动
-		ServerSocket ss = null;
-		Socket s = null;
-		DataInputStream dis = null;
+		new ChatServer().start();
+	}
+	
+	public void start(){
 		try {
 			ss = new ServerSocket(8888);
+			started = true; //Server启动
 		} catch (BindException e) {
 			System.out.println("Port is using...");
 			System.out.println("请关掉相关程序，并重新运行服务器");
@@ -23,33 +28,61 @@ public class ChatServer {
 		}
 		
 		try {
-			started = true; //Server启动
 			while(started) {
-				boolean bConnected = false;//客户端是否连接上
-				s = ss.accept();
+				Socket s = ss.accept();
+				Client c = new Client(s); 
 System.out.println("a client connected!");
-                bConnected = true;//客户端连接上
-                dis = new DataInputStream(s.getInputStream());
-                while(bConnected){
-                	 String str = dis.readUTF();
-                	 System.out.println(str);
-                }
+                new Thread(c).start();
                 //dis.close();
 			}
-		} catch (EOFException e){
-			System.out.println("Client closed!");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(dis!=null) 
-					dis.close();
-				if(s!=null) 
-					s.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
+				ss.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
 
+	class Client implements Runnable{
+		private Socket s;
+		private DataInputStream dis = null;
+		private boolean bConnected = false;
+		
+		public Client(Socket s){
+			this.s = s;
+			try {
+				dis = new DataInputStream(s.getInputStream());
+				bConnected = true;//客户端连接上
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void run() {
+             try {
+            	 while(bConnected){
+             	 String str = dis.readUTF();
+             	 System.out.println(str);
+            	 }
+             } catch (EOFException e){
+     			System.out.println("Client closed!");
+     		} catch (IOException e) {
+     			e.printStackTrace();
+     		} finally {
+     			try {
+     				if(dis!=null) 
+     					dis.close();
+     				if(s!=null) 
+     					s.close();
+     			} catch (IOException e1) {
+     				e1.printStackTrace();
+     			}
+     		}
+			
+		}
+		
+	}
 }
