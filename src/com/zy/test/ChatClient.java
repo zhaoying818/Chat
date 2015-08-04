@@ -12,6 +12,7 @@ import java.net.*;
 
 public class ChatClient extends Frame{
 	Socket s = null;
+	DataOutputStream dos = null;
 	
 	TextField tfTxt = new TextField();
 	TextArea taCon = new TextArea();
@@ -29,6 +30,7 @@ public class ChatClient extends Frame{
 		//增加窗口关闭的处理（使用匿名类）
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				disconnect();
 				System.exit(0);
 			}
 			
@@ -44,12 +46,26 @@ public class ChatClient extends Frame{
 	public void connect(){
 		try {
 			s = new Socket("127.0.0.1",8888);//IP+端口号
+			dos = new DataOutputStream(s.getOutputStream());
 System.out.println("connceted");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 关闭连接
+	 */
+	public void disconnect(){
+		try {
+			dos.close();
+			s.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private class TFListener implements ActionListener {
@@ -60,10 +76,9 @@ System.out.println("connceted");
 			tfTxt.setText("");
 			//发送信息到服务器
 			try {
-				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 				dos.writeUTF(str);
 				dos.flush();
-				dos.close();
+				//dos.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
