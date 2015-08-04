@@ -1,15 +1,19 @@
 package com.zy.test;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.*;
 
 import javax.management.loading.PrivateClassLoader;
 
+import java.util.*;
 public class ChatServer {
 	boolean started = false; 
 	ServerSocket ss = null;
+	
+	List<Client> clients = new ArrayList<Client>();
 	
 	public static void main(String[] args){
 		new ChatServer().start();
@@ -33,6 +37,7 @@ public class ChatServer {
 				Client c = new Client(s); 
 System.out.println("a client connected!");
                 new Thread(c).start();
+                clients.add(c);
                 //dis.close();
 			}
 		} catch (IOException e) {
@@ -47,15 +52,25 @@ System.out.println("a client connected!");
 	}
 
 	class Client implements Runnable{
-		private Socket s;
-		private DataInputStream dis = null;
+		private Socket s;//每个Client的连接
+		private DataInputStream dis = null;//从s中读数据
+		private DataOutputStream dos = null;
 		private boolean bConnected = false;
 		
 		public Client(Socket s){
 			this.s = s;
 			try {
 				dis = new DataInputStream(s.getInputStream());
+				dos = new DataOutputStream(s.getOutputStream());
 				bConnected = true;//客户端连接上
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void send(String str){
+			try {
+				dos.writeUTF(str);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -65,7 +80,25 @@ System.out.println("a client connected!");
              try {
             	 while(bConnected){
              	 String str = dis.readUTF();
-             	 System.out.println(str);
+System.out.println(str);
+            	 for(int i=0;i<clients.size();i++){
+            		 Client c = clients.get(i);
+            		 c.send(str);
+            	 }
+            	 /*
+            	 for(Iterator<Client> it = clients.iterator();it.hasNext();){
+            		 Client c = it.next();
+            		 c.send(str);
+            	 }
+            	 */
+            	 /*
+            	 Iterator<Client> it = clients.iterator();
+            	 while(it.hasNext()){
+            		 Client c = it.next();
+            		 c.send(str);
+            	 }
+            	 */
+            	 
             	 }
              } catch (EOFException e){
      			System.out.println("Client closed!");
@@ -75,6 +108,8 @@ System.out.println("a client connected!");
      			try {
      				if(dis!=null) 
      					dis.close();
+     				if(dos!=null)
+     					dos.close();
      				if(s!=null) 
      					s.close();
      			} catch (IOException e1) {
