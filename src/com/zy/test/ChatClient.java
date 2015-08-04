@@ -18,7 +18,10 @@ public class ChatClient extends Frame{
 	private boolean bConnected = false;
 	
 	TextField tfTxt = new TextField();
+	
 	TextArea taCon = new TextArea();
+	
+	Thread tRecv = new Thread(new RecVThread());
 	
 	public static void main(String[] args){
 		new ChatClient().launchFrame();
@@ -42,7 +45,7 @@ public class ChatClient extends Frame{
 		setVisible(true);
 		connect();
 		
-		new Thread(new RecVThread()).start();
+		tRecv.start();
 	}
 	
 	/**
@@ -66,12 +69,34 @@ System.out.println("connceted");
 	 * πÿ±’¡¨Ω”
 	 */
 	public void disconnect(){
+		
 		try {
 			dos.close();
+			dis.close();
 			s.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		/*
+		try {
+			bConnected = false;
+			tRecv.join();
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				dos.close();
+				dis.close();
+				s.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		*/
+		
 		
 	}
 	
@@ -102,10 +127,12 @@ System.out.println("connceted");
 				//System.out.println(str);
 				taCon.setText(taCon.getText() + str +'\n');
 				}
+			} catch (SocketException e) {
+				System.out.println("Exit!!!");
+				//e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			
+			} 
 			
 		}
 	}

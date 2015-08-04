@@ -106,12 +106,18 @@ System.out.println(str);
      			e.printStackTrace();
      		} finally {
      			try {
-     				if(dis!=null) 
+     				if(dis!=null) {
      					dis.close();
-     				if(dos!=null)
+     					dis = null;
+     				}
+     				if(dos!=null){
      					dos.close();
-     				if(s!=null) 
+     					dos = null;
+     				}		
+     				if(s!=null) {
      					s.close();
+     					s = null; 
+     				}		
      			} catch (IOException e1) {
      				e1.printStackTrace();
      			}
