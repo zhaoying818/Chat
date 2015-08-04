@@ -1,6 +1,7 @@
 package com.zy.test;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.*;
 
@@ -13,6 +14,8 @@ public class ChatServer {
 		DataInputStream dis = null;
 		try {
 			ss = new ServerSocket(8888);
+		} catch (BindException e) {
+			System.out.println("Port is using...");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -31,9 +34,10 @@ System.out.println("a client connected!");
                 }
                 //dis.close();
 			}
-		} catch (IOException e) {
-			//e.printStackTrace();
+		} catch (EOFException e){
 			System.out.println("Client closed!");
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 			try {
 				if(dis!=null) 
