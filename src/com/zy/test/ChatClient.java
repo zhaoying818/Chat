@@ -1,5 +1,7 @@
 package com.zy.test;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 
 public class ChatClient extends Frame{
@@ -17,6 +19,13 @@ public class ChatClient extends Frame{
 		add(tfTxt,BorderLayout.SOUTH);
 		add(taCon,BorderLayout.NORTH);
 		pack();
+		//增加窗口关闭的处理（使用匿名类）
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+			
+		});
 		setVisible(true);
 	}
 	
